@@ -23,6 +23,11 @@ def showCatalog():
 def showItems(category):
     return category
 
+@app.route("/catalog/items/new")
+def newItem():
+    return "New Item"
+
+
 @app.route("/catalog/<category>/items/<item>")
 def showItem(category, item):
     return "Show Item: %s, %s" % (category, item)
