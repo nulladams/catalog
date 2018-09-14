@@ -1,0 +1,47 @@
+<html>
+
+<head>
+</head>
+
+<body>
+  <div class="header">
+    <h1>Catalog</h1>
+  </div>
+
+  <a href="{{url_for('newItem')}}">Create New Item</a>
+
+  </br>
+  </br>
+  </br>
+
+  {% for category in categories %}
+
+  {{category.name}}
+  </br>
+
+  {% endfor %}
+
+
+  </br>
+  </br>
+  </br>
+
+  {% for item in items %}
+
+  {{item.id}}
+  </br>
+  <a href="{{url_for('showItem', category_id=item.cat_id, item_id=item.id)}}">{{item.title}}</a>
+  </br>
+  {{item.description}}
+  </br>
+  {{item.cat_id}}
+  </br>
+  {{item.category.name}}
+  </br>
+  </br>
+  {% endfor %}
+
+
+</body>
+
+</html>

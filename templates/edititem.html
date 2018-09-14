@@ -1,0 +1,29 @@
+<html>
+<body>
+<h1> Edit Item </h1>
+
+<form action="{{url_for('editItem', item_id=item.id)}}" method = 'POST'>
+
+<p>Title:</p>
+<input type='text' size='30' name='title' value={{item.title}}>
+<p>Description:</p>
+<textarea name='description' rows='10' cols='30'>{{item.description}}</textarea>
+<!--<input type='text' size='100' name='description'> -->
+<p>Category:</p>
+
+<select name='category'>
+  <option value={{item.cat_id}}>{{item.category.name}}</option>
+  {% for category in categories %}
+  <option value={{category.id}}>{{category.name}}</option>
+  {% endfor %}
+</select>
+</br>
+</br>
+<input type='submit' value='Edit'>
+
+</form>
+
+<a href={{url_for('showItem', category_id=item.cat_id, item_id=item.id)}}>Cancel</a>
+
+</body>
+</html>
