@@ -119,7 +119,7 @@ def deleteItem(item_id):
         return redirect(url_for('showCatalog'))
 
 #Show login page
-@app.route("/login")
+@app.route('/login')
 def showLogin():
     return ("Login")
 
@@ -127,6 +127,64 @@ def showLogin():
 @app.route("/catalog.json")
 def showCatalogItems():
     return "JSON"
+
+
+@app.route('/oauth/<provider>', methods = ['POST'])
+def login(provider):
+    print("ENTREI")
+    if provider == 'google':
+
+        print("entrei google")
+        #print(request.json)
+        print(request)
+        print(request.data)
+        #auth_code = request.json.get('auth_code')
+        auth_code = request.data
+        try:
+            oauth_flow = flow_from_clientsecrets('g_client_secrets.json',scope='')
+            oauth_flow.redirect_uri = 'postmessage'
+            credentials = oauth_flow.step2_exchange(auth_code)
+        except FlowExchangeError:
+            response = make_response(json.dumps('Failed to upgrade the autorization code.'), 401)
+            response.headers['Content-Type'] = 'application/json'
+            return
+
+        h = httplib2.Http()
+        userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+        params = {'access_token': credentials.access_token, 'alt':'json'}
+        answer = requests.get(userinfo_url, params=params)
+        print(answer)
+        print(answer.json())
+        data = answer.json()
+
+        name = data['name']
+        picture = data['picture']
+        email = data['email']
+
+        engine = create_engine('sqlite:///catalog.db')
+        Base.metadata.bind = engine
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+        user = session.query(User).filter_by(email=email).first()
+        if not user:
+            user = User(username=name, picture=picture, email=email)
+            session.add(user)
+            session.commit()
+
+        engine.dispose()
+
+        token = user.generate_auth_token(600)
+
+        return jsonify({'token':token.decode('ascii')})
+
+    else:
+        return 'Unrecoginized Provider'
+
+
+
+@app.route('/clientOAuth')
+def showOAuthProviders():
+    return render_template('clientOAuth.html')
 
 
 #Start application
