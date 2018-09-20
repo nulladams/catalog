@@ -1,0 +1,81 @@
+<html>
+
+<head>
+  <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+   <script src="https://apis.google.com/js/platform.js?onload=start"> </script>
+
+<!--script>
+    gapi.load('auth2', function() {
+      auth2 = gapi.auth2.init({
+        //client_id: '950296359546-tr6a0qci8smluvackvmj51bruuu73qos.apps.googleusercontent.com',
+        client_id: '450835458575-3f2c2ck830mi5o0llfrvu0ut994r3so4.apps.googleusercontent.com',
+        // Scopes to request in addition to 'profile' and 'email'
+        //scope: 'additional_scope'
+      });
+    });
+</script-->
+
+</head>
+
+<body>
+
+
+  <div class="header">
+    <a href="{{url_for('disconnect')}}">Logout</a>
+    <h1>Catalog</h1>
+  </div>
+
+  <a href="{{url_for('newItem')}}">Create New Item</a>
+
+  </br>
+  </br>
+  </br>
+
+  {% for category in categories %}
+
+  {{category.name}}
+  </br>
+
+  {% endfor %}
+
+
+  </br>
+  </br>
+  </br>
+
+  {% for item in items %}
+
+  {{item.id}}
+  </br>
+  <a href="{{url_for('showItemIn', category_id=item.cat_id, item_id=item.id)}}">{{item.title}}</a>
+  </br>
+  {{item.description}}
+  </br>
+  {{item.cat_id}}
+  </br>
+  {{item.category.name}}
+  </br>
+  </br>
+  {% endfor %}
+
+
+
+  <!--a href='#' onclick="signOut();">Sign Out from Google <a/> -->
+
+  <!--script>
+      function signOut() {
+          auth2.signOut().then(function() {
+              console.log('User signed out.');
+              setTimeout(function() {
+                window.location.href = "/catalog";
+                }, 4000);
+          });
+      }
+    </script-->
+  <!-- END GOOGLE SIGN IN CODE -->
+
+
+</body>
+
+</html>

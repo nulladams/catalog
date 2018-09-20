@@ -82,9 +82,28 @@ function signInCallback(json) {
         // Handle or verify the server response if necessary.
         if (result) {
           console.log(result)
-          $('#result').html('Login Successful!</br>'+ result + '')
+          console.log(result['token'])
+          $('#result').html('Login Successful!</br>'+ result['token'] + '')
           setTimeout(function() {
-           window.location.href = "/catalog";
+            /*var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/catalogin", true);
+            xhr.withCredentials = true;
+            xhr.setRequestHeader("Authorization", 'Basic ' + btoa(result['token'] + ':' + 'unused'));
+            xhr.onload = function () {
+              $('html').html(xhr.responseText)
+            };
+            xhr.send(); */
+            window.location.href = "/catalogin";
+            /*
+            $.ajax({
+              xhrFields: {
+                  withCredentials: true
+              },
+              beforeSend: function (xhr) {
+                  xhr.setRequestHeader('Authorization', 'Basic ' + btoa(result['token'] + ':' + 'unused'))
+              },
+              url: '/catalogin'
+            }); */
           }, 4000);
         } else if (authResult['error']) {
           console.log('There was an error: ' + authResult['error']);

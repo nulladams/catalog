@@ -11,7 +11,7 @@
     <div id="signinButton">
       <span class="g-signin"
       data-scope="openid email"
-      data-clientid="454096685975-1ipanhcv87l41ots32ccuponl5gu9et9.apps.googleusercontent.com"
+      data-clientid="450835458575-3f2c2ck830mi5o0llfrvu0ut994r3so4.apps.googleusercontent.com"
       data-redirecturi="postmessage"
       data-accesstype="offline"
       data-cookiepolicy="single_host_origin"
@@ -40,7 +40,8 @@
             if (result) {
               $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
              setTimeout(function() {
-              window.location.href = "/restaurants/";
+              //window.location.href = "/catalogin";
+              window.location.href = "{{url_for('showCatalogIn')}}"
              }, 4000);
 
           } else if (authResult['error']) {
@@ -54,7 +55,7 @@
     </script>
 
 
-    <script>
+    <!--script>
 
       window.fbAsyncInit = function() {
       FB.init({
@@ -102,26 +103,24 @@
       });
     }
 
-    </script>
+  </script-->
 
-    </br>
-    </br>
 
-    <button>
+    <!--button>
       <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
         <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
       </fb:login-button>
-    </button>
+    </button-->
 
-    </br>
-    </br>
+    <!--/br>
+    </br-->
 
-    <div
+    <!--div
       class="fb-like"
       data-share="true"
       data-width="450"
       data-show-faces="true">
-    </div>
+    </div-->
 
   </body>
 </html>
