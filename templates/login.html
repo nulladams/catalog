@@ -1,26 +1,79 @@
-
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
- </script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login</title>
 
-<script src="//apis.google.com/js/platform.js?onload=start"> </script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <!--link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}"-->
+    <style media="screen">
+      #login_area{
+        height: 400px;
+      }
+      #login_msg_box{
+        width: 100%;
+      }
+      .top_area{
+        height: 100px;
+      }
+    </style>
   </head>
 
   <body>
-    <div id="signinButton">
-      <span class="g-signin"
-      data-scope="openid email"
-      data-clientid="450835458575-3f2c2ck830mi5o0llfrvu0ut994r3so4.apps.googleusercontent.com"
-      data-redirecturi="postmessage"
-      data-accesstype="offline"
-      data-cookiepolicy="single_host_origin"
-      data-callback="signInCallback"
-      data-approvalprompt="force">
-      </span>
-    </div>
 
-    <div id="result"></div>
+    <header class="navbar sticky-top bg-dark" id="header_area">
+      <a class="navbar-brand mr-0 text-light" href="{{url_for('showCatalog')}}">Catalog</a>
+
+    </header>
+
+    <main class="container-fluid" id="main_area">
+
+      <div class="row">
+        <div class="top_area">
+
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col top_space">
+
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-4">
+
+        </div>
+        <div class="col">
+          <div id="login_area" class="container border border-primary bg-light d-flex flex-wrap align-content-center justify-content-center">
+            <div id="login_msg_box">
+              <p class="text-center text-info">Sign in with google account:</p>
+            </div>
+            <div id="signinButton">
+              <span class="g-signin"
+              data-scope="openid email"
+              data-clientid="450835458575-3f2c2ck830mi5o0llfrvu0ut994r3so4.apps.googleusercontent.com"
+              data-redirecturi="postmessage"
+              data-accesstype="offline"
+              data-cookiepolicy="single_host_origin"
+              data-callback="signInCallback"
+              data-approvalprompt="force">
+              </span>
+
+            </div>
+            <div id="result" class="d-flex flex-wrap align-content-center justify-content-center"></div>
+          </div>
+        </div>
+        <div class="col-4">
+
+        </div>
+
+      </div>
+    </main>
+
 
 
     <script>
@@ -28,6 +81,9 @@
       if (authResult['code']) {
         // Hide the sign-in button now that the user is authorized
         $('#signinButton').attr('style', 'display: none');
+        $('#login_msg_box').attr('style', 'display: none');
+        //$('#main_area').attr('style', 'display: none')
+        $('#header_area').attr('style', 'display: none')
         // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
         $.ajax({
           type: 'POST',
@@ -38,7 +94,7 @@
           success: function(result) {
             // Handle or verify the server response if necessary.
             if (result) {
-              $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+              $('#result').html('Login Successful!</br>'+ result + '</br><div><p>Redirecting...</p></div>')
              setTimeout(function() {
               //window.location.href = "/catalogin";
               window.location.href = "{{url_for('showCatalogIn')}}"
@@ -121,6 +177,14 @@
       data-width="450"
       data-show-faces="true">
     </div-->
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="//apis.google.com/js/platform.js?onload=start"> </script>
 
   </body>
 </html>

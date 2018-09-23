@@ -1,0 +1,12 @@
+.space{
+  background-color: yellow;
+}
+#login_area{
+  height: 400px;
+}
+.top_space{
+  height: 100px;
+}
+.login_msg_box{
+  width: 100%;
+}

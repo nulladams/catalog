@@ -1,48 +1,70 @@
-<html>
+<!DOCTYPE html>
+
+<html lang="en">
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Catalog</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <!--link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}"-->
+  <!-- Bootstrap 3 -->
+  <!--link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}"-->
 </head>
 
 <body>
-  <div class="header">
 
-    <a href={{url_for('showLogin')}}>Login</a>
+  <header class="navbar sticky-top bg-dark">
 
-    <h1>Catalog</h1>
+  <!--header class="navbar fixed-top navbar-light bg-light" id="login_and_title"-->
+    <a class="navbar-brand mr-0 text-light" href="{{url_for('showCatalog')}}">Catalog</a>
+    <form class="form-inline" action="{{url_for('showLogin')}}" method='GET'>
+      <button class="btn btn-primary"  type="submit">Login</button>
+    </form>
+  </header>
+
+
+  <div class="container-fluid" id="categories">
+    <div class="row">
+      <div class="col-2">
+        <nav class="nav flex-column pt-4 pl-2" role="navigation">
+          {% for category in categories %}
+          <div class="nav-item p-1">
+              {{category.name}}
+          </div>
+          {% endfor %}
+        </nav>
+      </div>
+      <div class="col pt-4">
+        <main class="row">
+          <div class="col-1"></div>
+          <div class="col">
+            {% for item in items %}
+            <article class="p-3 bg-white">
+                {{item.id}}</br>
+                <a href="{{url_for('showItem', category_id=item.cat_id, item_id=item.id)}}">{{item.title}}</a></br>
+                {{item.description}}</br>
+                {{item.cat_id}}</br>
+                {{item.category.name}}</br>
+            </article>
+            </br>
+            {% endfor %}
+          </div>
+          <div class="col-1"></div>
+        </main>
+      </div>
+    </div>
   </div>
 
-  </br>
-  </br>
-  </br>
 
-  {% for category in categories %}
-
-  {{category.name}}
-  </br>
-
-  {% endfor %}
-
-
-  </br>
-  </br>
-  </br>
-
-  {% for item in items %}
-
-  {{item.id}}
-  </br>
-  <a href="{{url_for('showItem', category_id=item.cat_id, item_id=item.id)}}">{{item.title}}</a>
-  </br>
-  {{item.description}}
-  </br>
-  {{item.cat_id}}
-  </br>
-  {{item.category.name}}
-  </br>
-  </br>
-  {% endfor %}
-
-
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
 </body>
 

@@ -413,13 +413,13 @@ def gconnect():
     print(login_session)
 
     output = ''
-    output +='<h1>Welcome, '
+    output +='<div><h3>Welcome, '
     output += login_session['username']
 
-    output += '!</h1>'
-    output += '<img src="'
+    output += '!</h3></div>'
+    output += '<div style="width: 100%"><img src="'
     output += login_session['picture']
-    output += '"style = "width: 300px; heigth: 300px; border-radius: 150px; -webkit-border-radius: 150px; -moz-border-radius: 150px;"> '
+    output += '"style = "width: 100px; heigth: 100px; border-radius: 150px; -webkit-border-radius: 150px; -moz-border-radius: 150px;"></div> '
     flash("you are now logged in as %s"%login_session['username'])
     print("done!")
     return output
@@ -493,4 +493,5 @@ def disconnect():
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
+    app.static_folder = 'static'
     app.run(host='0.0.0.0', port=8000)
