@@ -1,29 +1,69 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Catalog: Edit Item</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename="style.css")}}">
+</head>
+
 <body>
-<h1> Edit Item </h1>
-
-<form action="{{url_for('editItem', item_id=item.id)}}" method = 'POST'>
-
-<p>Title:</p>
-<input type='text' size='30' name='title' value={{item.title}}>
-<p>Description:</p>
-<textarea name='description' rows='10' cols='30'>{{item.description}}</textarea>
-<!--<input type='text' size='100' name='description'> -->
-<p>Category:</p>
-
-<select name='category'>
-  <option value={{item.cat_id}}>{{item.category.name}}</option>
-  {% for category in categories %}
-  <option value={{category.id}}>{{category.name}}</option>
-  {% endfor %}
-</select>
-</br>
-</br>
-<input type='submit' value='Save'>
-
-</form>
-
-<a href={{url_for('showItemIn', category_id=item.cat_id, item_id=item.id)}}>Cancel</a>
-
+  <header class="navbar sticky-top bg-dark">
+    <a class="navbar-brand mr-0 text-light" href="{{url_for('showCatalogIn')}}">Catalog</a>
+    <form class="form-inline" action="{{url_for('disconnect')}}" method='GET'>
+      <button class="btn btn-primary"  type="submit">Logout</button>
+    </form>
+  </header>
+  <main class="container-fluid" id="main_area">
+    <div class="row">
+      <div class="top_space">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-4">
+      </div>
+      <div class="col">
+        <div id="" class="container border border-primary bg-light d-flex flex-wrap align-content-center justify-content-center">
+          <h1> Edit Item </h1>
+          </br>
+          </br>
+          <form action="{{url_for('editItem', item_id=item.id)}}" method = 'POST'>
+            <div class="form-group">
+              <label for="item_title">Title:</label>
+              <input type='text' size='60' name='title' id="item_title" class="form-control" value="{{item.title}}">
+            </div>
+            <div class="form-group">
+              <label for="item_description">Description:</label>
+              <textarea name='description' id="item_description" class="form-control" rows='6' cols='30'>{{item.description}}</textarea>
+            </div>
+            <div class="form-group">
+              <label for="item_category">Category:</label>
+              <select name='category' id="item_category" class="custom-select">
+                <option value={{item.cat_id}}>{{item.category.name}}</option>
+                {% for category in categories %}
+                <option value={{category.id}}>{{category.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button class="btn btn-primary" type='submit'>Save</button>
+            <a class="btn btn-primary" href="{{url_for('showItemIn', category_id=item.cat_id, item_id=item.id)}}" role="button">Cancel</a>
+            </br>
+            </br>
+          </form>
+        </div>
+      </div>
+      <div class="col-4">
+      </div>
+    </div>
+  </main>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -1,12 +1,24 @@
-.space{
-  background-color: yellow;
+.bottom_space{
+  height: 25px;
+}
+.top_area{
+  height: 60px;
+}
+#delete_box{
+  width: 100%;
 }
 #login_area{
   height: 400px;
 }
-.top_space{
+#login_msg_box{
+  width: 100%;
+}
+.top_area{
   height: 100px;
 }
-.login_msg_box{
-  width: 100%;
+.space{
+  height: 30px;
+}
+.top_space{
+  height: 60px;
 }

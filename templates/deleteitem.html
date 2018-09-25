@@ -1,14 +1,52 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Catalog: Delete Item</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename="style.css")}}">
+</head>
+
 <body>
-<h1> Are you sure you want to delete item "{{item.title}}" ? </h1>
-
-<form action="{{url_for('deleteItem', item_id=item.id)}}" method = 'POST'>
-
-<input type='submit' value='Delete'>
-
-</form>
-
-<a href={{url_for('showItemIn', category_id=item.cat_id, item_id=item.id)}}>Cancel</a>
-
+  <header class="navbar sticky-top bg-dark">
+    <a class="navbar-brand mr-0 text-light" href="{{url_for('showCatalogIn')}}">Catalog</a>
+    <form class="form-inline" action="{{url_for('disconnect')}}" method='GET'>
+      <button class="btn btn-primary"  type="submit">Logout</button>
+    </form>
+  </header>
+  <main class="container-fluid" id="main_area">
+    <div class="row">
+      <div class="top_area">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col top_space">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2">
+      </div>
+      <div class="col">
+        <div id="delete_box" class="container border border-primary bg-light d-flex flex-wrap align-content-center justify-content-center p-3">
+          <h2> Are you sure you want to delete item "{{item.title}}" ? </h2>
+          </br>
+          </br>
+          </br>
+          <form action="{{url_for('deleteItem', item_id=item.id)}}" method = 'POST'>
+            <button class="btn btn-primary" type='submit'>Delete</button>
+            <a class="btn btn-primary" href={{url_for('showItemIn', category_id=item.cat_id, item_id=item.id)}} role="button">Cancel</a>
+          </form>
+        </div>
+      </div>
+      <div class="col-2">
+      </div>
+    </div>
+  </main>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 </body>
+
 </html>
