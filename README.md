@@ -48,5 +48,8 @@ $python3 catalogApp.py
 
 3) To access the API endpoint, type the address "http://localhost:8000/catalog.json";
 
+4) To access the API endpoint for a specific item, type the address "http://localhost:8000/catalog/item_id/json"
+
+
 # License
 [MIT](https://choosealicense.com/licenses/mit/)

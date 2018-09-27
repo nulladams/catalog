@@ -17,6 +17,8 @@ from sqlalchemy.orm import sessionmaker
 from models import Base, Category, Item, User
 from flask import session as login_session
 import json
+import controller
+
 
 # Google client secrets
 CLIENT_ID = json.loads(open('g_client_secrets.json',
@@ -29,22 +31,9 @@ auth = HTTPBasicAuth()
 
 @auth.verify_password
 def verify_password(username_or_token, password):
-    print(username_or_token)
-    engine = create_engine('sqlite:///catalog.db')
-    Base.metadata.bind = engine
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    user_id = User.verify_auth_token(username_or_token)
-    if user_id:
-        user = session.query(User).filter_by(id=user_id).one()
-    else:
-        user = session.query(User).filter_by(username=username_or_token).first()  # noqa
-        if not user:
-            return False
-        elif not user.verify_password(password):
-            print("Unable to verify password")
-            return False
-    engine.dispose()
+    user = controller.getUserByUsernameOrToken(username_or_token, password)
+    if not user:
+        return False
     g.user = user
     return True
 
@@ -53,13 +42,8 @@ def verify_password(username_or_token, password):
 @app.route("/")
 @app.route("/catalog")
 def showCatalog():
-    engine = create_engine('sqlite:///catalog.db')
-    Base.metadata.bind = engine
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    categories = session.query(Category).all()
-    items = session.query(Item).order_by(Item.id.desc()).limit(5)
-    engine.dispose()
+    categories = controller.getCategories()
+    items = controller.getLastItems()
     category = ""
     return render_template('catalog.html', categories=categories,
                            items=items, category=category)
@@ -68,17 +52,38 @@ def showCatalog():
 # Show catalog with categories and lasts items added, after looged in
 @app.route("/catalogin")
 def showCatalogIn():
-    if 'username' in login_session:
-        engine = create_engine('sqlite:///catalog.db')
-        Base.metadata.bind = engine
-        DBSession = sessionmaker(bind=engine)
-        session = DBSession()
-        categories = session.query(Category).all()
-        items = session.query(Item).order_by(Item.id.desc()).limit(5)
-        engine.dispose()
-        category = ""
+    categories = controller.getCategories()
+    items = controller.getLastItems()
+    category = ""
+    return render_template('catalogin.html', categories=categories,
+                           items=items, category=category)
+
+
+# Show items from a specific category
+@app.route("/catalog/<int:category_id>/items")
+def showItems(category_id):
+    categories = controller.getCategories()
+    items = controller.getItems(category_id)
+    items_count = controller.countItems(category_id)
+    category = controller.getCategory(category_id)
+    category_name = category.name
+    return render_template('catalog.html', categories=categories,
+                           items=items, category=category_name,
+                           count=items_count)
+
+
+# Show items from a specific category after logged in
+@app.route("/catalogin/<int:category_id>/items")
+def showItemsIn(category_id):
+    if ('username' in login_session):
+        categories = controller.getCategories()
+        items = controller.getItems(category_id)
+        items_count = controller.countItems(category_id)
+        category = controller.getCategory(category_id)
+        category_name = category.name
         return render_template('catalogin.html', categories=categories,
-                               items=items, category=category)
+                               items=items, category=category_name,
+                               count=items_count)
     else:
         content = '''
         <script>
@@ -93,66 +98,19 @@ def showCatalogIn():
         return alert
 
 
-# Show items from a specific category
-@app.route("/catalog/<int:category_id>/items")
-def showItems(category_id):
-    engine = create_engine('sqlite:///catalog.db')
-    Base.metadata.bind = engine
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    categories = session.query(Category).all()
-    items = session.query(Item).filter_by(cat_id=category_id).all()
-    items_count = session.query(Item).filter_by(cat_id=category_id).count()
-    category = session.query(Category).filter_by(id=category_id).one()
-    category_name = category.name
-    engine.dispose()
-    return render_template('catalog.html', categories=categories,
-                           items=items, category=category_name,
-                           count=items_count)
-
-
-# Show items from a specific category after logged in
-@app.route("/catalogin/<int:category_id>/items")
-def showItemsIn(category_id):
-    engine = create_engine('sqlite:///catalog.db')
-    Base.metadata.bind = engine
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    categories = session.query(Category).all()
-    items = session.query(Item).filter_by(cat_id=category_id).all()
-    items_count = session.query(Item).filter_by(cat_id=category_id).count()
-    category = session.query(Category).filter_by(id=category_id).one()
-    category_name = category.name
-    engine.dispose()
-    return render_template('catalogin.html', categories=categories,
-                           items=items, category=category_name,
-                           count=items_count)
-
-
 # Add new items
 @app.route("/catalogin/items/new", methods=['GET', 'POST'])
 def newItem():
     if 'username' in login_session:
         if request.method == 'POST':
-            engine = create_engine('sqlite:///catalog.db')
-            Base.metadata.bind = engine
-            DBSession = sessionmaker(bind=engine)
-            session = DBSession()
-            newItem = Item(title=request.form['title'],
-                           description=request.form['description'],
-                           cat_id=request.form['category'])
-            session.add(newItem)
-            session.commit()
-            engine.dispose()
+            item = controller.createItem(title=request.form['title'],
+                                         description=request.form['description'],  # noqa
+                                         cat_id=request.form['category'],
+                                         user_id=login_session['user_id'])
             return redirect(url_for('showCatalogIn'))
 
         if request.method == 'GET':
-            engine = create_engine('sqlite:///catalog.db')
-            Base.metadata.bind = engine
-            DBSession = sessionmaker(bind=engine)
-            session = DBSession()
-            categories = session.query(Category).all()
-            engine.dispose()
+            categories = controller.getCategories()
             return render_template('newitem.html', categories=categories)
 
     else:
@@ -172,26 +130,31 @@ def newItem():
 # Show an item
 @app.route("/catalog/<int:category_id>/items/<int:item_id>")
 def showItem(category_id, item_id):
-    engine = create_engine('sqlite:///catalog.db')
-    Base.metadata.bind = engine
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    item = session.query(Item).filter_by(id=item_id).one()
-    engine.dispose()
+    item = controller.getItem(item_id)
     return render_template('showitem.html', item=item)
 
 
 # Show item after logged in, with possibility to edit and detete the item
 @app.route("/catalogin/<int:category_id>/items/<int:item_id>")
 def showItemIn(category_id, item_id):
-    if 'username' in login_session:
-        engine = create_engine('sqlite:///catalog.db')
-        Base.metadata.bind = engine
-        DBSession = sessionmaker(bind=engine)
-        session = DBSession()
-        item = session.query(Item).filter_by(id=item_id).one()
-        engine.dispose()
-        return render_template('showitemin.html', item=item)
+    if ('username' in login_session):
+        isUserAuhorized = controller.checkUserAuthorization(login_session['user_id'],  # noqa
+                                                            item_id)
+        if isUserAuhorized:
+            item = controller.getItem(item_id)
+            return render_template('showitemin.html', item=item)
+        else:
+            content = '''
+            <script>
+                function showAlert() {{
+                    alert('You do not have permission!Please login first!');
+                    window.location.href = "{catalog_url}";
+                }}
+            </script>
+            <body onload='showAlert()'>
+            '''  # noqa
+            alert = content.format(catalog_url=url_for('showCatalogIn'))
+            return alert
     else:
         content = '''
         <script>
@@ -209,29 +172,37 @@ def showItemIn(category_id, item_id):
 # Edit an item
 @app.route("/catalogin/<int:item_id>/edit", methods=['GET', 'POST'])
 def editItem(item_id):
-    if 'username' in login_session:
-        engine = create_engine('sqlite:///catalog.db')
-        Base.metadata.bind = engine
-        DBSession = sessionmaker(bind=engine)
-        session = DBSession()
-        if request.method == 'GET':
-            item = session.query(Item).filter_by(id=item_id).one()
-            categories = session.query(Category).all()
-            engine.dispose()
-            return render_template('edititem.html',
-                                   item=item,
-                                   categories=categories)
-        if request.method == 'POST':
-            item = session.query(Item).filter_by(id=item_id).one()
-            item.title = request.form['title']
-            item.description = request.form['description']
-            item.cat_id = request.form['category']
-            session.add(item)
-            session.commit()
-            engine.dispose()
-            return redirect(url_for('showItemIn',
-                                    category_id=item.cat_id,
-                                    item_id=item.id))
+    if ('username' in login_session):
+        isUserAuhorized = controller.checkUserAuthorization(login_session['user_id'],  # noqa
+                                                            item_id)
+        if isUserAuhorized:
+            if request.method == 'GET':
+                item = controller.getItem(item_id)
+                categories = controller.getCategories()
+                return render_template('edititem.html',
+                                       item=item,
+                                       categories=categories)
+            if request.method == 'POST':
+                item = controller.editItem(item_id=item_id,
+                                           title=request.form['title'],
+                                           description=request.form['description'],  # noqa
+                                           cat_id=request.form['category'])  # noqa
+                return redirect(url_for('showItemIn',
+                                        category_id=item.cat_id,
+                                        item_id=item.id))
+        else:
+            content = '''
+            <script>
+                function showAlert() {{
+                    alert('You do not have permission!Please login first!');
+                    window.location.href = "{catalog_url}";
+                }}
+            </script>
+            <body onload='showAlert()'>
+            '''  # noqa
+            alert = content.format(catalog_url=url_for('showCatalogIn'))
+            return alert
+
     else:
         content = '''
         <script>
@@ -249,20 +220,29 @@ def editItem(item_id):
 # Delete an item
 @app.route("/catalogin/<int:item_id>/delete", methods=['GET', 'POST'])
 def deleteItem(item_id):
-    if 'username' in login_session:
-        engine = create_engine('sqlite:///catalog.db')
-        Base.metadata.bind = engine
-        DBSession = sessionmaker(bind=engine)
-        session = DBSession()
-        item = session.query(Item).filter_by(id=item_id).one()
-        if request.method == 'GET':
-            engine.dispose()
-            return render_template('deleteitem.html', item=item)
-        if request.method == 'POST':
-            session.delete(item)
-            session.commit()
-            engine.dispose()
-            return redirect(url_for('showCatalogIn'))
+    if ('username' in login_session):
+        isUserAuhorized = controller.checkUserAuthorization(login_session['user_id'],  # noqa
+                                                            item_id)
+        if isUserAuhorized:
+            if request.method == 'GET':
+                item = controller.getItem(item_id)
+                return render_template('deleteitem.html', item=item)
+            if request.method == 'POST':
+                controller.deleteItem(item_id)
+                return redirect(url_for('showCatalogIn'))
+        else:
+            content = '''
+            <script>
+                function showAlert() {{
+                    alert('You do not have permission!Please login first!');
+                    window.location.href = "{catalog_url}";
+                }}
+            </script>
+            <body onload='showAlert()'>
+            '''  # noqa
+            alert = content.format(catalog_url=url_for('showCatalogIn'))
+            return alert
+
     else:
         content = '''
         <script>
@@ -281,15 +261,11 @@ def deleteItem(item_id):
 @app.route("/catalog.json")
 def showCatalogItems():
     if 'username' in login_session:
-        engine = create_engine('sqlite:///catalog.db')
-        Base.metadata.bind = engine
-        DBSession = sessionmaker(bind=engine)
-        session = DBSession()
-        categories = session.query(Category).all()
+        categories = controller.getCategories()
         category_array = []
         for category in categories:
             category_dict = category.serialize
-            items = session.query(Item).filter_by(id=category.id).all()
+            items = controller.getItems(category.id)
             item_array = []
             for item in items:
                 item_array.append(item.serialize)
@@ -313,6 +289,42 @@ def showCatalogItems():
         return alert
 
 
+# Provide JSON endpoint for a specific item
+@app.route("/catalog/<int:item_id>/json")
+def itemJSONendpoint(item_id):
+    if ('username' in login_session):
+        isUserAuhorized = controller.checkUserAuthorization(login_session['user_id'],  # noqa
+                                                            item_id)
+        if isUserAuhorized:
+            item = controller.getItem(item_id)
+            return jsonify(item=item.serialize)
+        else:
+            content = '''
+            <script>
+                function showAlert() {{
+                    alert('You do not have permission!Please login first!');
+                    window.location.href = "{catalog_url}";
+                }}
+            </script>
+            <body onload='showAlert()'>
+            '''  # noqa
+            alert = content.format(catalog_url=url_for('showCatalogIn'))
+            return alert
+    else:
+        content = '''
+        <script>
+            function showAlert() {{
+                alert('You do not have permission!Please login first!');
+                window.location.href = "{catalog_url}";
+            }}
+        </script>
+        <body onload='showAlert()'>
+        '''
+        alert = content.format(catalog_url=url_for('showCatalog'))
+        return alert
+
+
+# Google sign-in
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Check if is the same user that asking to log in
@@ -392,18 +404,11 @@ def gconnect():
     login_session['provider'] = 'google'
 
     # Check if the user is already in the database
-    engine = create_engine('sqlite:///catalog.db')
-    Base.metadata.bind = engine
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    user = session.query(User).filter_by(email=login_session['email']).first()
+    user = controller.getUserByEmail(email=login_session['email'])
     if not user:
-        user = User(username=login_session['username'],
-                    picture=login_session['picture'],
-                    email=login_session['email'])
-        session.add(user)
-        session.commit()
-    engine.dispose()
+        user = controller.createUser(username=login_session['username'],
+                                     picture=login_session['picture'],
+                                     email=login_session['email'])
 
     login_session['user_id'] = user.id
     token = user.generate_auth_token(600)
